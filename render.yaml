@@ -3,6 +3,7 @@ services:
   - type: web
     name: hiuman-api
     runtime: docker
+    plan: free
     dockerfilePath: hiuman-api/Dockerfile
     dockerContext: hiuman-api
     envVars:
@@ -21,6 +22,7 @@ services:
   - type: web
     name: hiuman-signal
     runtime: node
+    plan: free
     rootDir: hiuman-signal
     buildCommand: npm install
     startCommand: node index.js
@@ -32,6 +34,7 @@ services:
   - type: web
     name: hiuman-web
     runtime: static
+    plan: free
     rootDir: hiuman-web
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
