@@ -1,0 +1,49 @@
+services:
+  # 1. PHP Backend (API)
+  - type: web
+    name: hiuman-api
+    payload:
+      docker:
+        dockerfilePath: hiuman-api/Dockerfile
+        contextPath: hiuman-api
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_PORT
+        sync: false
+
+  # 2. Node Signaling Server
+  - type: web
+    name: hiuman-signal
+    runtime: node
+    rootDir: hiuman-signal
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+
+  # 3. React Frontend
+  - type: web
+    name: hiuman-web
+    runtime: static
+    rootDir: hiuman-web
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: hiuman-api
+          property: url
+      - key: VITE_SIGNAL_URL
+        fromService:
+          type: web
+          name: hiuman-signal
+          property: url

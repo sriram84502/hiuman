@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    /* #09090b */
+    --foreground: 0 0% 98%;
+
+    --primary: 263 70% 50%;
+    /* #7c3aed Purple-600 base */
+    --primary-foreground: 210 40% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 210 40% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+  }
+
+  body {
+    @apply bg-zinc-950 text-white antialiased;
+  }
+}
