@@ -37,12 +37,6 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: hiuman-api
-          property: url
+        sync: false
       - key: VITE_SIGNAL_URL
-        fromService:
-          type: web
-          name: hiuman-signal
-          property: url
+        sync: false
