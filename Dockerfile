@@ -23,7 +23,7 @@ RUN cd hiuman-web && npm install && npm run build
 # 5. Setup Backend (Hiuman API)
 COPY hiuman-api ./hiuman-api
 # Move API to /var/www/html/api
-RUN mkdir -p /var/www/html/api && cp -r hiuman-api/api/* /var/www/html/api/
+RUN mkdir -p /var/www/html/api && cp -r hiuman-api/api/. /var/www/html/api/
 COPY hiuman-api/api/config /var/www/html/api/config
 COPY hiuman-api/api/controllers /var/www/html/api/controllers
 # Setup root setup scripts if needed, but mainly API inside /api
