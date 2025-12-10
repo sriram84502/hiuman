@@ -45,29 +45,32 @@ RUN echo '<VirtualHost *:80> \n\
         Require all granted \n\
     </Directory> \n\
     \n\
-    # Proxy WebSocket to Node.js \n\
-    ProxyPreserveHost On \n\
-    ProxyPass /socket.io http://localhost:3001/socket.io \n\
-    ProxyPassReverse /socket.io http://localhost:3001/socket.io \n\
-    \n\
-    RewriteEngine On \n\
-    \n\
-    # 1. Exclude /api request from SPA rewrite (let api/.htaccess handle them) \n\
-    RewriteCond %{REQUEST_URI} ^/api \n\
-    RewriteRule ^ - [L] \n\
-    \n\
-    # 2. Exclude /socket.io from SPA rewrite (handled by proxy) \n\
-    RewriteCond %{REQUEST_URI} ^/socket.io \n\
-    RewriteRule ^ - [L] \n\
-    \n\
-    # 3. Exclude /assets from SPA rewrite (Serve statically or 404) \n\
-    RewriteCond %{REQUEST_URI} ^/assets \n\
-    RewriteRule ^ - [L] \n\
-    \n\
-    # 4. SPA Fallback: If not file/dir, go to index.html \n\
-    RewriteCond %{REQUEST_FILENAME} !-f \n\
-    RewriteCond %{REQUEST_FILENAME} !-d \n\
-    RewriteRule ^ /index.html [L] \n\
+    # Proxy WebSocket to Node.js
+    ProxyPreserveHost On
+    
+    RewriteEngine On
+    
+    # 1. Handle WebSocket Upgrade (wss:// -> ws://)
+    RewriteCond %{HTTP:Upgrade} websocket [NC]
+    RewriteCond %{HTTP:Connection} upgrade [NC]
+    RewriteRule ^/socket.io/(.*) ws://localhost:3001/socket.io/$1 [P,L]
+
+    # 2. Handle Standard HTTP Polling
+    ProxyPass /socket.io http://localhost:3001/socket.io
+    ProxyPassReverse /socket.io http://localhost:3001/socket.io
+    
+    # 3. Exclude /api request from SPA rewrite (let api/.htaccess handle them)
+    RewriteCond %{REQUEST_URI} ^/api
+    RewriteRule ^ - [L]
+
+    # 4. Exclude /assets from SPA rewrite (Serve statically or 404)
+    RewriteCond %{REQUEST_URI} ^/assets
+    RewriteRule ^ - [L]
+
+    # 5. SPA Fallback: If not file/dir, go to index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ /index.html [L]
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
 # 9. Fix Permissions (Ensure Apache can read built files)

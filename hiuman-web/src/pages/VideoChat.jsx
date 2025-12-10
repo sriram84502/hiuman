@@ -69,7 +69,9 @@ const VideoChat = () => {
 
         return () => {
             if (socketRef.current) socketRef.current.disconnect();
-            if (stream) stream.getTracks().forEach(track => track.stop());
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
+            }
         };
     }, []);
 
