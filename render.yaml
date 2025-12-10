@@ -2,10 +2,9 @@ services:
   # 1. PHP Backend (API)
   - type: web
     name: hiuman-api
-    payload:
-      docker:
-        dockerfilePath: hiuman-api/Dockerfile
-        contextPath: hiuman-api
+    runtime: docker
+    dockerfilePath: hiuman-api/Dockerfile
+    dockerContext: hiuman-api
     envVars:
       - key: DB_HOST
         sync: false
