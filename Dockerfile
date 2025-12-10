@@ -37,41 +37,8 @@ RUN cd hiuman-signal && npm install
 RUN cp -r hiuman-web/dist/* /var/www/html/
 
 # 8. Configure Apache Site (Reverse Proxy + Rewrite Rules)
-RUN echo '<VirtualHost *:80> \n\
-    DocumentRoot /var/www/html \n\
-    <Directory /var/www/html> \n\
-        Options Indexes FollowSymLinks \n\
-        AllowOverride All \n\
-        Require all granted \n\
-    </Directory> \n\
-    \n\
-    # Proxy WebSocket to Node.js
-    ProxyPreserveHost On
-    
-    RewriteEngine On
-    
-    # 1. Handle WebSocket Upgrade (wss:// -> ws://)
-    RewriteCond %{HTTP:Upgrade} websocket [NC]
-    RewriteCond %{HTTP:Connection} upgrade [NC]
-    RewriteRule ^/socket.io/(.*) ws://localhost:3001/socket.io/$1 [P,L]
-
-    # 2. Handle Standard HTTP Polling
-    ProxyPass /socket.io http://localhost:3001/socket.io
-    ProxyPassReverse /socket.io http://localhost:3001/socket.io
-    
-    # 3. Exclude /api request from SPA rewrite (let api/.htaccess handle them)
-    RewriteCond %{REQUEST_URI} ^/api
-    RewriteRule ^ - [L]
-
-    # 4. Exclude /assets from SPA rewrite (Serve statically or 404)
-    RewriteCond %{REQUEST_URI} ^/assets
-    RewriteRule ^ - [L]
-
-    # 5. SPA Fallback: If not file/dir, go to index.html
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ /index.html [L]
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+# 8. Configure Apache Site (Copy from local file)
+COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
 # 9. Fix Permissions (Ensure Apache can read built files)
 RUN chown -R www-data:www-data /var/www/html \
