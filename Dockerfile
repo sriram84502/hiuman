@@ -60,14 +60,22 @@ RUN echo '<VirtualHost *:80> \n\
     RewriteCond %{REQUEST_URI} ^/socket.io \n\
     RewriteRule ^ - [L] \n\
     \n\
-    # 3. SPA Fallback: If not file/dir, go to index.html \n\
+    # 3. Exclude /assets from SPA rewrite (Serve statically or 404) \n\
+    RewriteCond %{REQUEST_URI} ^/assets \n\
+    RewriteRule ^ - [L] \n\
+    \n\
+    # 4. SPA Fallback: If not file/dir, go to index.html \n\
     RewriteCond %{REQUEST_FILENAME} !-f \n\
     RewriteCond %{REQUEST_FILENAME} !-d \n\
     RewriteRule ^ /index.html [L] \n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# 9. Copy Supervisor Config
+# 9. Fix Permissions (Ensure Apache can read built files)
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# 10. Copy Supervisor Config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# 10. Start
+# 11. Start
 CMD ["/usr/bin/supervisord"]
