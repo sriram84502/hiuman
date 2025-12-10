@@ -1,9 +1,5 @@
-// Use Env var for Prod, fallback to local proxy for Dev
-let url = import.meta.env.VITE_API_URL || '/api';
-if (url.startsWith('http') && !url.endsWith('/api')) {
-    url += '/api';
-}
-export const API_BASE = url;
+// In Monolith, everything is same-origin.
+export const API_BASE = '/api';
 
 export const api = {
     get: async (endpoint) => {

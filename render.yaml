@@ -1,11 +1,11 @@
 services:
-  # 1. PHP Backend (API)
+  # The One & Only "HIUMAN" Server
   - type: web
-    name: hiuman-api
+    name: hiuman-monolith
     runtime: docker
     plan: free
-    dockerfilePath: hiuman-api/Dockerfile
-    dockerContext: hiuman-api
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: DB_HOST
         sync: false
@@ -17,29 +17,8 @@ services:
         sync: false
       - key: DB_PORT
         sync: false
-
-  # 2. Node Signaling Server
-  - type: web
-    name: hiuman-signal
-    runtime: node
-    plan: free
-    rootDir: hiuman-signal
-    buildCommand: npm install
-    startCommand: node index.js
-    envVars:
-      - key: PORT
-        value: 10000
-
-  # 3. React Frontend
-  - type: web
-    name: hiuman-web
-    runtime: static
-    plan: free
-    rootDir: hiuman-web
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
+      # Frontend needs to know where API is (Same Host)
       - key: VITE_API_URL
-        sync: false
+        value: /api
       - key: VITE_SIGNAL_URL
-        sync: false
+        value: /

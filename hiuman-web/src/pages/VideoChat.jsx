@@ -46,7 +46,8 @@ const VideoChat = () => {
             });
 
         // 2. Connect to Signaling Server
-        const SIGNAL_URL = import.meta.env.VITE_SIGNAL_URL || '';
+        // Monolith proxies /socket.io, so we connect to current host path
+        const SIGNAL_URL = '/';
         // If empty, io() connects to same host (proxy). If set, connects to remote.
 
         try {
