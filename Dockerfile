@@ -36,7 +36,7 @@ RUN cd hiuman-signal && npm install
 # We want React at root /, API at /api
 RUN cp -r hiuman-web/dist/* /var/www/html/
 
-# 8. Configure Apache Site (Reverse Proxy for Socket.io)
+# 8. Configure Apache Site (Reverse Proxy + Rewrite Rules)
 RUN echo '<VirtualHost *:80> \n\
     DocumentRoot /var/www/html \n\
     <Directory /var/www/html> \n\
@@ -50,8 +50,20 @@ RUN echo '<VirtualHost *:80> \n\
     ProxyPass /socket.io http://localhost:3001/socket.io \n\
     ProxyPassReverse /socket.io http://localhost:3001/socket.io \n\
     \n\
-    # Fallback for React Router (SPA) \n\
-    FallbackResource /index.html \n\
+    RewriteEngine On \n\
+    \n\
+    # 1. Exclude /api request from SPA rewrite (let api/.htaccess handle them) \n\
+    RewriteCond %{REQUEST_URI} ^/api \n\
+    RewriteRule ^ - [L] \n\
+    \n\
+    # 2. Exclude /socket.io from SPA rewrite (handled by proxy) \n\
+    RewriteCond %{REQUEST_URI} ^/socket.io \n\
+    RewriteRule ^ - [L] \n\
+    \n\
+    # 3. SPA Fallback: If not file/dir, go to index.html \n\
+    RewriteCond %{REQUEST_FILENAME} !-f \n\
+    RewriteCond %{REQUEST_FILENAME} !-d \n\
+    RewriteRule ^ /index.html [L] \n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
 # 9. Copy Supervisor Config
